@@ -55,6 +55,8 @@ def latex():
     
     SVGText = ''
     latexEquation = ''
+    textSize = '500'
+    texColor=''
 
     if request.method == 'POST':
 
@@ -64,6 +66,8 @@ def latex():
         latexEquation = request.form['latexEquation']
         submittedEquation = submittedEquation.replace("\\\\","\\").replace("'","")
         texColor = request.form['texColor']
+        textSize = request.form['latexSize']
+
         file = open('{}/test.tex'.format(tmpfile),'w')
         for i in range(len(submittedPreamble.split('\\r\\n\\'))):
             file.write(submittedPreamble.split('\\r\\n\\')[i])
@@ -81,8 +85,12 @@ def latex():
 
         with open('{}/test.svg'.format(tmpfile), 'r') as myfile:
             SVGText = myfile.read().replace('\n', '')
-            SVGText = SVGText.split('<defs>')[1]
+            SVGText = SVGText.split('viewBox')[1]
             SVGText = SVGText.replace('rgb(0%,0%,0%)',texColor)
 
     error = None
-    return render_template('latex.html', latexEquation=latexEquation,SVGText=SVGText, latexPreamble=latexPreambleString.replace('\\\\',"\\").replace('\\n\\',''))
+    return render_template('latex.html', latexSize=textSize, 
+                                         texColor=texColor,
+                                         latexEquation=latexEquation,
+                                         SVGText=SVGText, 
+                                         latexPreamble=latexPreambleString.replace('\\\\',"\\").replace('\\n\\',''))
