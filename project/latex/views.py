@@ -9,8 +9,6 @@ from secrets import token_hex
 import os
 from subprocess import call
 
-import cairosvg
-
 
 ################
 #### config ####
