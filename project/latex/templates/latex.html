@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{%  block content %}
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+<img src='data:image/svg+xml;utf8,<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100%"  viewBox="0 0 300 36" version="1.1"><defs>{{ SVGText }}
+' alt="">
+
+
+<form action="" class="form" role="form" method="POST">
+<div class="input-group">
+  <textarea class="form-control custom-control" aria-label="With textarea" name="latexPreamble">{{ latexPreamble }}</textarea>
+</div>
+<div class="input-group">
+  <textarea class="form-control custom-control" aria-label="With textarea" name="latexEquation">{{latexEquation}}</textarea>
+</div>
+    <input class="btn btn-primary" type="submit" value="Build LaTeX">
+
+    <input type="color" id="myColor" name="texColor">
+</form>
+
+{% endblock %}
