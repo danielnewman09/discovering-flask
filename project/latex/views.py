@@ -37,13 +37,14 @@ def latex():
 
     latexPreambleString = \
     r'\\documentclass[preview,border={0pt 5pt 0pt 0pt}]{standalone}\n\
-\\usepackage{fancyhdr}\n\
+\usepackage[usenames,dvipsnames,svgnames,table]{xcolor} % use color\n\
+\\usepackage{algpseudocode}\n\
+\\usepackage{mathtools}\n\
 \\usepackage{graphicx}\n\
 \\usepackage{amssymb}\n\
 \\usepackage{epstopdf}\n\
 \\usepackage{amsmath}\n\
 \\usepackage{amssymb}\n\
-\\usepackage{cite}\n\
 \\usepackage{float}\n\
 \\usepackage[normalem]{ulem}\n\
 \\usepackage{multirow}\n\
@@ -57,6 +58,7 @@ def latex():
     latexEquation = ''
     textSize = '500'
     texColor=''
+    error = None
 
     if request.method == 'POST':
 
@@ -68,28 +70,38 @@ def latex():
         texColor = request.form['texColor']
         textSize = request.form['latexSize']
 
+        print(submittedEquation)
+
         file = open('{}/test.tex'.format(tmpfile),'w')
         for i in range(len(submittedPreamble.split('\\r\\n\\'))):
             file.write(submittedPreamble.split('\\r\\n\\')[i])
             file.write('\n')
-        for j in range(len(submittedEquation.split('\\r'))):
+        for j in range(len(submittedEquation.split('\\r\\n'))):
             file.write(submittedEquation.split('\\r\\n')[j])
             file.write('\n')
         file.write(r'\end{document}')
         file.close()
 
-        call(['pdflatex', '-output-directory', tmpfile, '{}/test.tex'.format(tmpfile)])
-        call(['pdfcrop','{}/test.pdf'.format(tmpfile),'{}/test.pdf'.format(tmpfile)])
-        call(['pdf2svg','{}/test.pdf'.format(tmpfile),'{}/test.svg'.format(tmpfile)])
-        # cairosvg.svg2png(url='{}/test.svg'.format(tmpfile), write_to='{}/test.png'.format(tmpfile),dpi=int(300))
+        call(['pdflatex', '-halt-on-error', '-output-directory', tmpfile, '{}/test.tex'.format(tmpfile)])
 
-        with open('{}/test.svg'.format(tmpfile), 'r') as myfile:
-            SVGText = myfile.read().replace('\n', '')
-            SVGText = SVGText.split('viewBox')[1]
-            SVGText = SVGText.replace('rgb(0%,0%,0%)',texColor)
+        if os.path.isfile('{}/test.pdf'.format(tmpfile)):
 
-    error = None
+            call(['pdfcrop','{}/test.pdf'.format(tmpfile),'{}/test.pdf'.format(tmpfile)])
+            call(['pdf2svg','{}/test.pdf'.format(tmpfile),'{}/test.svg'.format(tmpfile)])
+            # cairosvg.svg2png(url='{}/test.svg'.format(tmpfile), write_to='{}/test.png'.format(tmpfile),dpi=int(300))
+
+            with open('{}/test.svg'.format(tmpfile), 'r') as myfile:
+                SVGText = myfile.read().replace('\n', '')
+                SVGText = SVGText.split('viewBox')[1]
+                SVGText = SVGText.replace('rgb(0%,0%,0%)',texColor)
+
+        else: 
+
+            error = 'Invalid LaTeX code. Check your syntax and try again.'
+
+    
     return render_template('latex.html', latexSize=textSize, 
+                                         error=error,
                                          texColor=texColor,
                                          latexEquation=latexEquation,
                                          SVGText=SVGText, 
